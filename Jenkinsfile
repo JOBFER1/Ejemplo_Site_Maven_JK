@@ -5,11 +5,6 @@ pipeline{
         jdk 'JDK_8'
     }
     stages{
-//        stage('Checkout') {
-//            steps {
-//                bat "xcopy /E C:\\workspaceJenkins\\Ejemplo_Site_Maven_JK /Y"
-//            }
-//        }
         stage('Compilar') {
             steps {
                 bat 'mvn clean package'
@@ -22,23 +17,21 @@ pipeline{
             }
         }
         
-        //stage("Checkstyle") {
-        //    steps{
-        //         bat 'mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs com.github.spotbugs:spotbugs-maven-plugin:3.1.7:spotbugs'
-                 //spotbugs:spotbugs
-            //}
-            //post {
-            //    always {
-            //        junit testResults: '**/target/surefire-reports/TEST-*.xml'
-
-            //        recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
-            //        recordIssues enabledForFailure: true, tool: checkStyle()
-            //        recordIssues enabledForFailure: true, tool: spotBugs()
-            //        recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
-            //        recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
-            //    }
-        //    }
-        //}        
+        stage("Checkstyle") {
+            steps{
+                 bat 'mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs com.github.spotbugs:spotbugs-maven-plugin:3.1.7:spotbugs'
+            }
+            post {
+                always {
+                    recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
+                    recordIssues enabledForFailure: true, tool: checkStyle()
+                    recordIssues enabledForFailure: true, tool: findBugs()
+                    recordIssues enabledForFailure: true, tool: spotBugs()
+                    recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
+                    recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
+                }
+            }
+        }        
 
         stage('Cobertura'){
             steps{
